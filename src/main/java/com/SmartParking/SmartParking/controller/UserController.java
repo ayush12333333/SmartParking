@@ -1,5 +1,8 @@
 package com.SmartParking.SmartParking.controller;
 
+import com.SmartParking.SmartParking.dto.PasswordView;
+import com.SmartParking.SmartParking.dto.UpdateProfileRequest;
+import com.SmartParking.SmartParking.dto.UserProfileDTO;
 import com.SmartParking.SmartParking.entity.User;
 import com.SmartParking.SmartParking.service.ParkingSlotService;
 
@@ -29,18 +32,33 @@ import com.SmartParking.SmartParking.service.UserService;
             }
         }
 
-        @PutMapping("/update")
-        public ResponseEntity<?> updateUser(
-                @AuthenticationPrincipal UserDetails userDetails,
-                @RequestBody User updatedUser
-        ) {
-            try {
-                User user = userService.updateUser(userDetails.getUsername(), updatedUser);
-                return ResponseEntity.ok(user);
-            } catch (Exception e) {
-                return ResponseEntity.badRequest().body(e.getMessage());
-            }
+    @PutMapping("/update-profile")
+    public ResponseEntity<?> updateUser(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody UpdateProfileRequest request
+    ) {
+        try {
+            User user = userService.updateUser(userDetails.getUsername(), request);
+            return ResponseEntity.ok(new UserProfileDTO(user));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @PutMapping("/update-password")
+    public ResponseEntity<?> updatePassword(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody PasswordView request
+    ) {
+        try {
+            userService.changePassword(userDetails.getUsername(), request.getOldPassword(), request.getNewPassword());
+            return ResponseEntity.ok("Password updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+}
 
 

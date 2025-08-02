@@ -12,7 +12,8 @@ import java.util.Optional;
 public interface BookingRepository extends JpaRepository<Booking,Long> {
     List<Booking> findByUserAndActiveTrue(User user);
     List<Booking> findByUserIdAndActiveTrue(Long userId);
-    Optional<Booking> findBySlotAndActiveTrue(ParkingSlot slot); // to check if slot already booked
+    Optional<Booking> findBySlotIdAndActiveTrue(Long slot); // to check if slot already booked
+    Optional<Booking> findByIdAndActiveTrue(Long bookingId);
 
     List<Booking> findByUser(User user);
 }

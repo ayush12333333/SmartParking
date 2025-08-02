@@ -1,12 +1,15 @@
 package com.SmartParking.SmartParking.service;
 
+import com.SmartParking.SmartParking.entity.Booking;
 import com.SmartParking.SmartParking.entity.ParkingSlot;
 
 import com.SmartParking.SmartParking.entity.VehicleType;
+import com.SmartParking.SmartParking.repository.BookingRepository;
 import com.SmartParking.SmartParking.repository.ParkingSlotRepository;
 import com.SmartParking.SmartParking.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -19,6 +22,8 @@ public class ParkingSlotService {
     @Autowired
     private ParkingSlotRepository slotRepo;
 
+    @Autowired
+    private BookingRepository bookingRepository;
 
     @Autowired
     private UserRepository userRepo;
@@ -34,8 +39,10 @@ public class ParkingSlotService {
         slot.setSlotNumber(slotNumber);
         if (slot.getVehicleType() == VehicleType.CAR) {
             slot.setFareAmount(40);
+            slot.setBaseFare(40.0);
         } else if (slot.getVehicleType() == VehicleType.BIKE) {
             slot.setFareAmount(20);
+            slot.setBaseFare(20.0);
         }
         slot.setAvailable(true);
         return slotRepo.save(slot);
@@ -65,10 +72,10 @@ public class ParkingSlotService {
         return slotRepo.findByLocationAndVehicleTypeAndAvailableTrue(location, vehicleType);
     }
 
-    // Additional method for user bookings
     public List<ParkingSlot> getBookingsByUser(String email) {
         return slotRepo.findByBookedBy_Email(email);
     }
+
 
 }
 

@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 @Service
@@ -32,14 +35,23 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String username, String role) {
+        Map<String, Object> claims = new HashMap<>();
+
+        // ✅ Add proper authorities format expected by Spring Security
+        claims.put("authorities", List.of("ROLE_" + role.toUpperCase()));
+        claims.put("role", role.toUpperCase());
+
         return Jwts.builder()
+                .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() +  1000 * 60 * 60 * 10))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+
+
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String extractedUsername = extractUsername(token);

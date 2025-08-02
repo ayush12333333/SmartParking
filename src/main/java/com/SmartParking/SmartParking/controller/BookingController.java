@@ -1,6 +1,7 @@
 package com.SmartParking.SmartParking.controller;
 
 
+import com.SmartParking.SmartParking.dto.BookingDTO;
 import com.SmartParking.SmartParking.dto.BookingResponse;
 import com.SmartParking.SmartParking.entity.Booking;
 import com.SmartParking.SmartParking.entity.ParkingSlot;
@@ -93,6 +94,32 @@ private BookingRepository  bookingRepo;
         List<ParkingSlot> slots = parkingService.getBookingsByUser(email);
         return ResponseEntity.ok(slots);
     }
+
+    @GetMapping("/admin/all-bookings")
+    public ResponseEntity<?> getAllBookings(@AuthenticationPrincipal UserDetails userDetails) {
+        User currentUser = userService.getUserByEmail(userDetails.getUsername());
+
+        if (currentUser.getRole() != UserRole.ADMIN) {
+            return ResponseEntity.status(403).body("Access denied: Admins only.");
+        }
+
+        List<Booking> allBookings = bookingRepo.findAll();
+
+        List<BookingDTO> dtoList = allBookings.stream().map(booking -> {
+            return new BookingDTO(
+                    booking.getId(),
+                    booking.getUser().getEmail(),
+                    booking.getSlot().getSlotNumber(),
+                    booking.getSlot().getLocation(),
+                    booking.getCheckInTime(),
+                    booking.getCheckOutTime(),
+                    booking.getFareAmount()
+            );
+        }).toList();
+
+        return ResponseEntity.ok(dtoList);
+    }
+
 
 
 

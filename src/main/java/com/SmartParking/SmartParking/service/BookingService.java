@@ -7,6 +7,7 @@ import com.SmartParking.SmartParking.entity.User;
 import com.SmartParking.SmartParking.repository.BookingRepository;
 import com.SmartParking.SmartParking.repository.ParkingSlotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,7 +76,7 @@ public class BookingService {
 
 
     public void cancelBooking(Long bookingId, User user) {
-        Booking booking = bookingRepo.findById(bookingId)
+        Booking booking = bookingRepo.findBySlotIdAndActiveTrue(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
         // Check if the booking belongs to the current user
@@ -98,7 +99,7 @@ public class BookingService {
 
 @Transactional
     public double checkout(Long bookingId, User user) {
-        Booking booking = bookingRepo.findById(bookingId)
+        Booking booking = bookingRepo.findBySlotIdAndActiveTrue(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
         if (!booking.getUser().equals(user) || !booking.isActive()) {
@@ -136,5 +137,14 @@ public class BookingService {
     public List<Booking> getBookingsByUser(User user) {
         return bookingRepo.findByUser(user);
     }
+
+    public List<ParkingSlot> getBookingsByUser(String email) {
+        return slotRepo.findByBookedBy_Email(email);
+    }
+
+    public List<Booking> getAllBookings() {
+        return bookingRepo.findAll(); // make sure this returns proper booking list with slot + user
+    }
+
 
 }

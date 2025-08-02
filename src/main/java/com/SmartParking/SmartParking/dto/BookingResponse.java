@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+// this is for user wants to check my bookings aur post new booking then get a response
 public class BookingResponse {
     private String message;
     private Long slotId;
